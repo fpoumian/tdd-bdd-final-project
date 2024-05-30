@@ -180,6 +180,16 @@ class TestProductRoutes(TestCase):
         response = self.client.get(f'{BASE_URL}/999')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_update_product(self):
+        """It should update a Product"""
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_product = response.get_json()
+        new_product['description'] = 'unknown'
+        response = self.client.put(f'{BASE_URL}/{new_product["id"]}', json=new_product)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
     ######################################################################
     # Utility functions
     ######################################################################
