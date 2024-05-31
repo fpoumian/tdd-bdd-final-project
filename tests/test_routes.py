@@ -190,6 +190,15 @@ class TestProductRoutes(TestCase):
         response = self.client.put(f'{BASE_URL}/{new_product["id"]}', json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_update_product_not_found(self):
+        """It should not Update a Product thats not found"""
+        test_product = ProductFactory()
+        response = self.client.post(BASE_URL, json=test_product.serialize())
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        new_product = response.get_json()
+        response = self.client.put(f'{BASE_URL}/156', json=new_product)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
     def test_delete_product(self):
         """It should delete a Product"""
         products = self._create_products(5)
@@ -201,6 +210,11 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         new_product_count = self.get_product_count()
         self.assertEqual(new_product_count, initial_product_count - 1)
+
+    def test_delete_product_not_found(self):
+        """It should not Delete a Product thats not found"""
+        response = self.client.delete(f'{BASE_URL}/157')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_product_list(self):
         """It should Get a list of Products"""
@@ -214,12 +228,11 @@ class TestProductRoutes(TestCase):
         """It should Query Products by name"""
         products = self._create_products(5)
         test_name = products[0].name
-        logging.debug(f'test_name:{test_name}')
         matching_products = len([product for product in products if product.name == test_name])
         response = self.client.get(f'{BASE_URL}?name={test_name}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        logging.debug(f'data: {data}')
+        logging.debug('Data: %s', data)
         self.assertEqual(matching_products, len(data))
 
     def test_query_by_category(self):
@@ -228,7 +241,7 @@ class TestProductRoutes(TestCase):
         category = products[0].category
         found = [product for product in products if product.category == category]
         found_count = len(found)
-        logging.debug(f'There are {found_count} matching products')
+        logging.debug('There are {%d} matching products', found_count)
         response = self.client.get(f'{BASE_URL}?category={category.name}')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -241,16 +254,13 @@ class TestProductRoutes(TestCase):
         products = self._create_products(10)
         available_products = [product for product in products if product.available]
         found_count = len(available_products)
-        logging.debug(f'There are {found_count} matching products')
+        logging.debug('There are {%d} matching products', found_count)
         response = self.client.get(f'{BASE_URL}?available=True')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), found_count)
         for product in data:
             self.assertEqual(product["available"], True)
-        
-
-
 
     ######################################################################
     # Utility functions

@@ -119,7 +119,7 @@ def list_products():
         category_value = getattr(Category, category.upper())
         products = Product.find_by_category(category_value)
     elif available:
-         products = Product.find_by_availability(available)
+        products = Product.find_by_availability(available)
     else:
         products = Product.all()
 
@@ -134,6 +134,7 @@ def list_products():
 #
 # PLACE YOUR CODE HERE TO READ A PRODUCT
 #
+
 
 @app.route("/products/<int:product_id>", methods=["GET"])
 def get_products(product_id):
@@ -159,6 +160,7 @@ def get_products(product_id):
 # PLACE YOUR CODE TO UPDATE A PRODUCT HERE
 #
 
+
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_products(product_id):
     """
@@ -180,10 +182,6 @@ def update_products(product_id):
     return serialized_product, status.HTTP_200_OK
 
 
-
-
-
-
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
@@ -192,6 +190,7 @@ def update_products(product_id):
 #
 # PLACE YOUR CODE TO DELETE A PRODUCT HERE
 #
+
 
 @app.route("/products/<int:product_id>", methods=["DELETE"])
 def delete_products(product_id):
@@ -206,5 +205,5 @@ def delete_products(product_id):
     if found_product:
         found_product.delete()
         return "", status.HTTP_204_NO_CONTENT
-    
+
     return "", status.HTTP_404_NOT_FOUND
