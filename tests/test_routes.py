@@ -190,6 +190,35 @@ class TestProductRoutes(TestCase):
         response = self.client.put(f'{BASE_URL}/{new_product["id"]}', json=new_product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+    def test_delete_product(self):
+        """It should delete a Product"""
+        products = self._create_products(5)
+        initial_product_count = self.get_product_count()
+        test_product = products[0]
+        response = self.client.delete(f'{BASE_URL}/{test_product.id}')
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        response = self.client.get(f'{BASE_URL}/{test_product.id}')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        new_product_count = self.get_product_count()
+        self.assertEqual(new_product_count, initial_product_count - 1)
+
+    def test_get_product_list(self):
+        """It should Get a list of Products"""
+        self._create_products(5)
+        response = self.client.get(BASE_URL)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
+
+    # def test_query_by_name(self):
+    #     """It should Query Products by name"""
+    #     products = self._create_products(5)
+    #     test_name = products[0].name
+    #     matching_products = len([product for product in products if product.name == test_name])
+    #     print(matching_products)
+
+
+
     ######################################################################
     # Utility functions
     ######################################################################
